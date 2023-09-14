@@ -6,20 +6,20 @@ pragma solidity ^0.8.11;
 /* solhint-disable reason-string */
 
 // Base
-import "../utils/BaseAccount.sol";
+import "./utils/BaseAccount.sol";
 
 // Extensions
-import "../../../extension/Multicall.sol";
-import "../../../extension/upgradeable//Initializable.sol";
-import "../../../extension/upgradeable//AccountPermissions.sol";
-import "../../../extension/upgradeable//ContractMetadata.sol";
-import "../../../external-deps/openzeppelin/token/ERC721/utils/ERC721Holder.sol";
-import "../../../external-deps/openzeppelin/token/ERC1155/utils/ERC1155Holder.sol";
-import "../../../eip/ERC1271.sol";
+import "./extension/Multicall.sol";
+import "./extension/upgradeable/Initializable.sol";
+import "./extension/upgradeable/AccountPermissions.sol";
+import "./extension/upgradeable/ContractMetadata.sol";
+import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import "./eip/ERC1271.sol";
 
 // Utils
-import "../../../external-deps/openzeppelin/utils/cryptography/ECDSA.sol";
-import "../utils/BaseAccountFactory.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "./utils/BaseAccountFactory.sol";
 
 //   $$\     $$\       $$\                 $$\                         $$\
 //   $$ |    $$ |      \__|                $$ |                        $$ |

@@ -2,12 +2,12 @@
 pragma solidity ^0.8.12;
 
 // Utils
-import "../../extension/Multicall.sol";
+import "../extension/Multicall.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../utils/BaseAccount.sol";
-import "../../extension/interface/IAccountPermissions.sol";
-import "../../lib/BytesLib.sol";
+import "../extension/interface/IAccountPermissions.sol";
+import "../lib/BytesLib.sol";
 
 // Interface
 import "../interface/IEntrypoint.sol";
