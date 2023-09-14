@@ -12,3 +12,8 @@ docs/
 
 # Dotenv file
 .env
+
+.idea
+node_modules
+forge-cache
+yarn.lock
