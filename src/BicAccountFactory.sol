@@ -14,7 +14,8 @@ import "./extension/upgradeable/ContractMetadata.sol";
 import "./interface/IEntrypoint.sol";
 
 // Smart wallet implementation
-import { Account } from "./Account.sol";
+import { BicAccount } from "./BicAccount.sol";
+import "forge-std/console.sol";
 
 //   $$\     $$\       $$\                 $$\                         $$\
 //   $$ |    $$ |      \__|                $$ |                        $$ |
@@ -25,15 +26,20 @@ import { Account } from "./Account.sol";
 //   \$$$$  |$$ |  $$ |$$ |$$ |      \$$$$$$$ |\$$$$$\$$$$  |\$$$$$$$\ $$$$$$$  |
 //    \____/ \__|  \__|\__|\__|       \_______| \_____\____/  \_______|\_______/
 
-contract AccountFactory is BaseAccountFactory, ContractMetadata, PermissionsEnumerable {
+contract BicAccountFactory is BaseAccountFactory, ContractMetadata, PermissionsEnumerable {
+    // recovery address using to change admin address if needed
+    address public recoveryAddress;
+
     /*///////////////////////////////////////////////////////////////
                             Constructor
     //////////////////////////////////////////////////////////////*/
 
     constructor(IEntryPoint _entrypoint)
-        BaseAccountFactory(address(new Account(_entrypoint, address(this))), address(_entrypoint))
+        BaseAccountFactory(address(new BicAccount(_entrypoint, address(this))), address(_entrypoint))
     {
+        console.log("BicAccountFactory: constructor");
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        recoveryAddress = msg.sender;
     }
 
     /*///////////////////////////////////////////////////////////////
@@ -46,11 +52,17 @@ contract AccountFactory is BaseAccountFactory, ContractMetadata, PermissionsEnum
         address _admin,
         bytes calldata _data
     ) internal override {
-        Account(payable(_account)).initialize(_admin, _data);
+        console.log("BicAccountFactory: _initializeAccount");
+        BicAccount(payable(_account)).initialize(_admin, _data);
     }
 
     /// @dev Returns whether contract metadata can be set in the given execution context.
     function _canSetContractURI() internal view virtual override returns (bool) {
         return hasRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
+    function changeRecoveryAddress(address _recoveryAddress) public {
+        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "BicAccountFactory: changeRecoveryAddress: only admin can change recovery address");
+        recoveryAddress = _recoveryAddress;
     }
 }

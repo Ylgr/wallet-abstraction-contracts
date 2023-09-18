@@ -19,7 +19,8 @@ import "./eip/ERC1271.sol";
 
 // Utils
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "./utils/BaseAccountFactory.sol";
+import "./BicAccountFactory.sol";
+import "forge-std/console.sol";
 
 //   $$\     $$\       $$\                 $$\                         $$\
 //   $$ |    $$ |      \__|                $$ |                        $$ |
@@ -30,7 +31,7 @@ import "./utils/BaseAccountFactory.sol";
 //   \$$$$  |$$ |  $$ |$$ |$$ |      \$$$$$$$ |\$$$$$\$$$$  |\$$$$$$$\ $$$$$$$  |
 //    \____/ \__|  \__|\__|\__|       \_______| \_____\____/  \_______|\_______/
 
-contract Account is
+contract BicAccount is
     Initializable,
     ERC1271,
     Multicall,
@@ -61,6 +62,7 @@ contract Account is
     receive() external payable virtual {}
 
     constructor(IEntryPoint _entrypoint, address _factory) EIP712("Account", "1") {
+        console.log("BicAccount constructor");
         _disableInitializers();
         factory = _factory;
         entrypointContract = _entrypoint;
@@ -69,6 +71,8 @@ contract Account is
     /// @notice Initializes the smart contract wallet.
     function initialize(address _defaultAdmin, bytes calldata) public virtual initializer {
         _setAdmin(_defaultAdmin, true);
+        _setAdmin(BicAccountFactory(factory).recoveryAddress(), true);
+        console.log("BicAccount initialized");
     }
 
     /// @notice Checks whether the caller is the EntryPoint contract or the admin.
@@ -224,7 +228,7 @@ contract Account is
 
     /// @dev Registers the account on the factory if it hasn't been registered yet.
     function _registerOnFactory() internal virtual {
-        BaseAccountFactory factoryContract = BaseAccountFactory(factory);
+        BicAccountFactory factoryContract = BicAccountFactory(factory);
         if (!factoryContract.isRegistered(address(this))) {
             factoryContract.onRegister();
         }
@@ -293,9 +297,9 @@ contract Account is
         super._setAdmin(_account, _isAdmin);
         if (factory.code.length > 0) {
             if (_isAdmin) {
-                BaseAccountFactory(factory).onSignerAdded(_account);
+                BicAccountFactory(factory).onSignerAdded(_account);
             } else {
-                BaseAccountFactory(factory).onSignerRemoved(_account);
+                BicAccountFactory(factory).onSignerRemoved(_account);
             }
         }
     }
@@ -303,7 +307,7 @@ contract Account is
     /// @notice Runs after every `changeRole` run.
     function _afterSignerPermissionsUpdate(SignerPermissionRequest calldata _req) internal virtual override {
         if (factory.code.length > 0) {
-            BaseAccountFactory(factory).onSignerAdded(_req.signer);
+            BicAccountFactory(factory).onSignerAdded(_req.signer);
         }
     }
 
