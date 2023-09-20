@@ -163,6 +163,22 @@ contract BicAccountFactoryTest is Test {
         assertEq(account2.getNonce(), 0);
         assertEq(account2.isAdmin(user2), true);
 
-        vm.prank(user1);
+        vm.prank(randomExecuteer);
+
+        bytes memory executeCallData = abi.encodeWithSignature("transfer(address,uint256)", accountAddress2, 50);
+//        bytes memory initCode = abi.encodePacked(abi.encodePacked(address(accountFactory)), executeCallData);
+        UserOperation[] memory userOpCreateAccount = _setupUserOpExecute(
+            user1PKey,
+            bytes(""),
+            address(token),
+            0,
+            executeCallData,
+            accountAddress1
+        );
+
+        EntryPoint(entrypoint).handleOps(userOpCreateAccount, payable(randomExecuteer));
+
+        assertEq(token.balanceOf(accountAddress1), 50);
+        assertEq(token.balanceOf(accountAddress2), 50);
     }
 }
