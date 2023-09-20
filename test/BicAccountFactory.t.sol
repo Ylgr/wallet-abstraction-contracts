@@ -139,6 +139,10 @@ contract BicAccountFactoryTest is Test {
         assertEq(account.isAdmin(user2), false);
         assertEq(account.isAdmin(accountFactory.recoveryAddress()), true);
 
+        vm.prank(user2);
+        vm.expectRevert("AccountPermissions: caller is not an admin");
+        account.setAdmin(user2, true);
+
         vm.prank(accountFactory.recoveryAddress());
         account.setAdmin(user2, true);
         account.setAdmin(user1, false);
@@ -147,7 +151,7 @@ contract BicAccountFactoryTest is Test {
     }
 
     function test_sendErc20Token() public {
-        vm.prank(user1);
+        vm.prank(randomExecuteer);
         address accountAddress1 = accountFactory.createAccount(user1, "");
         BicAccount account1 = BicAccount(payable(accountAddress1));
         assertEq(account1.getNonce(), 0);
@@ -157,16 +161,12 @@ contract BicAccountFactoryTest is Test {
         token.mint(accountAddress1, 100);
         assertEq(token.balanceOf(accountAddress1), 100);
 
-        vm.prank(user2);
         address accountAddress2 = accountFactory.createAccount(user2, "");
         BicAccount account2 = BicAccount(payable(accountAddress2));
         assertEq(account2.getNonce(), 0);
         assertEq(account2.isAdmin(user2), true);
 
-        vm.prank(randomExecuteer);
-
         bytes memory executeCallData = abi.encodeWithSignature("transfer(address,uint256)", accountAddress2, 50);
-//        bytes memory initCode = abi.encodePacked(abi.encodePacked(address(accountFactory)), executeCallData);
         UserOperation[] memory userOpCreateAccount = _setupUserOpExecute(
             user1PKey,
             bytes(""),
@@ -181,4 +181,5 @@ contract BicAccountFactoryTest is Test {
         assertEq(token.balanceOf(accountAddress1), 50);
         assertEq(token.balanceOf(accountAddress2), 50);
     }
+
 }
