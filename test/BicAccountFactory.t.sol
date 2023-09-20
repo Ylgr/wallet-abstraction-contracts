@@ -107,13 +107,14 @@ contract BicAccountFactoryTest is Test {
 
         bytes memory initCallData = abi.encodeWithSignature("createAccount(address,bytes)", user1, bytes(""));
         bytes memory initCode = abi.encodePacked(abi.encodePacked(address(accountFactory)), initCallData);
+        address user1AccountAddress = accountFactory.getAddress(user1, "");
         UserOperation[] memory userOpCreateAccount = _setupUserOpExecute(
             user1PKey,
             initCode,
             address(0),
             0,
             bytes(""),
-            user1
+            user1AccountAddress
         );
 
         EntryPoint(entrypoint).handleOps(userOpCreateAccount, payable(user1));
@@ -145,7 +146,7 @@ contract BicAccountFactoryTest is Test {
         assertEq(account.isAdmin(user2), true);
     }
 
-    function test_createAccountAndSendErc20Token() public {
+    function test_sendErc20Token() public {
         vm.prank(user1);
         address accountAddress1 = accountFactory.createAccount(user1, "");
         BicAccount account1 = BicAccount(payable(accountAddress1));

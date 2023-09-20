@@ -18,6 +18,7 @@ import "./SenderCreator.sol";
 import "./Helpers.sol";
 import "./NonceManager.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "forge-std/console.sol";
 
 contract EntryPoint is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard {
     using UserOperationLib for UserOperation;
@@ -367,7 +368,11 @@ contract EntryPoint is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard 
             if (sender.code.length != 0) revert FailedOp(opIndex, "AA10 sender already constructed");
             address sender1 = senderCreator.createSender{ gas: opInfo.mUserOp.verificationGasLimit }(initCode);
             if (sender1 == address(0)) revert FailedOp(opIndex, "AA13 initCode failed or OOG");
-            if (sender1 != sender) revert FailedOp(opIndex, "AA14 initCode must return sender");
+            if (sender1 != sender) {
+                console.log("sender1", sender1);
+                console.log("sender", sender);
+                revert FailedOp(opIndex, "AA14 initCode must return sender");
+            }
             if (sender1.code.length == 0) revert FailedOp(opIndex, "AA15 initCode must create sender");
             address factory = address(bytes20(initCode[0:20]));
             emit AccountDeployed(opInfo.userOpHash, sender, factory, opInfo.mUserOp.paymaster);
