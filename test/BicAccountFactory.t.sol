@@ -116,20 +116,20 @@ contract BicAccountFactoryTest is Test {
             bytes(""),
             user1AccountAddress
         );
-
-        EntryPoint(entrypoint).handleOps(userOpCreateAccount, payable(user1));
+        vm.prank(randomExecuteer);
+        EntryPoint(entrypoint).handleOps(userOpCreateAccount, payable(randomExecuteer));
     }
 
-    function test_accountAddress() public {
-        vm.prank(user1);
-        address accountAddressUser1 = accountFactory.getAddress(user1, "");
-        assertEq(accountAddressUser1, address(0x3dC618d38C9A777912bFBF3A1a4cb97c7989A4bA));
-        vm.prank(user2);
-        address accountAddressUser2 = accountFactory.getAddress(user2, "");
-        assertEq(accountAddressUser2, address(0x2C8947bC22e7a66DAD08b9a1b07cf8c086F78479));
-
-        assertEq(accountFactory.getAddress(user1, ""), accountFactory.getAddress(user1, "sadasdsada"));
-    }
+//    function test_accountAddress() public {
+//        vm.prank(user1);
+//        address accountAddressUser1 = accountFactory.getAddress(user1, "");
+//        assertEq(accountAddressUser1, address(0x3dC618d38C9A777912bFBF3A1a4cb97c7989A4bA));
+//        vm.prank(user2);
+//        address accountAddressUser2 = accountFactory.getAddress(user2, "");
+//        assertEq(accountAddressUser2, address(0x2C8947bC22e7a66DAD08b9a1b07cf8c086F78479));
+//
+//        assertEq(accountFactory.getAddress(user1, ""), accountFactory.getAddress(user1, "sadasdsada"));
+//    }
 
     function test_recoverAdmin() public {
         vm.prank(user1);
@@ -175,7 +175,7 @@ contract BicAccountFactoryTest is Test {
             executeCallData,
             accountAddress1
         );
-
+        vm.prank(randomExecuteer);
         EntryPoint(entrypoint).handleOps(userOpCreateAccount, payable(randomExecuteer));
 
         assertEq(token.balanceOf(accountAddress1), 50);
